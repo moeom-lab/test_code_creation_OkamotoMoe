@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -47,7 +48,9 @@ public class Case01 {
 	void test01() {
 		// ログイン画面表示確認
 		webDriver.get("http://localhost:8080/lms/");
-		assertEquals("http://localhost:8080/lms/", webDriver.getCurrentUrl());
+
+		WebElement cssElement = webDriver.findElement(By.cssSelector(".col-lg-2.control-label"));
+		assertEquals("ログインID", cssElement.getText(), "ログインIDが画面に表示されていること");
 
 		//待ち処理
 		final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));

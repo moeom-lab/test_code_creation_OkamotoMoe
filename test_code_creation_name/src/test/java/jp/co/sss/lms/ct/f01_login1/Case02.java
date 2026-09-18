@@ -45,16 +45,19 @@ public class Case02 {
 	@Order(1)
 	@DisplayName("テスト01 トップページURLでアクセス")
 	void test01() {
-		// ログイン画面を開く
+		// ログイン画面表示確認
 		webDriver.get("http://localhost:8080/lms/");
 
-		assertEquals("http://localhost:8080/lms/", webDriver.getCurrentUrl());
+		WebElement cssElement = webDriver.findElement(By.cssSelector(".col-lg-2.control-label"));
+		assertEquals("ログインID", cssElement.getText(), "ログインIDが画面に表示されていること");
 
+		//待ち処理
 		final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("loginId")));
 
+		//エビデンス取得
 		WebDriverUtils.getEvidence(new Object() {
-		}, "case02_01");
+		}, "case1");
 	}
 
 	/** Test02 */
