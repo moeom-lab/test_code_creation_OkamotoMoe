@@ -47,9 +47,7 @@ public class Case02 {
 	void test01() {
 		// ログイン画面表示確認
 		webDriver.get("http://localhost:8080/lms/");
-
-		WebElement cssElement = webDriver.findElement(By.cssSelector(".col-lg-2.control-label"));
-		assertEquals("ログインID", cssElement.getText(), "ログインIDが画面に表示されていること");
+		assertEquals("ログイン | LMS", webDriver.getTitle());
 
 		//待ち処理
 		final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
