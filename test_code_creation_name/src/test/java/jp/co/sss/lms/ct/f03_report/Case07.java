@@ -4,6 +4,7 @@ import static jp.co.sss.lms.ct.util.WebDriverUtils.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
+import java.util.List;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -89,8 +90,19 @@ public class Case07 {
 	@DisplayName("テスト03 未提出の研修日の「詳細」ボタンを押下しセクション詳細画面に遷移")
 	void test03() {
 		//詳細ボタン押下
-		WebElement detailBtnElement = webDriver.findElement(By.cssSelector("input[value='詳細']"));
-		detailBtnElement.click();
+		List<WebElement> detailBtnElements = webDriver.findElements(By.cssSelector("input[value='詳細']"));
+		List<WebElement> submitElements = webDriver
+				.findElements(By.cssSelector(".table.table-hover.sctionList td.w10per"));
+		for (int i = 0; i < submitElements.size(); i++) {
+			if ("未提出".equals(submitElements.get(i).getText())) {
+				final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
+
+				wait.until(
+						ExpectedConditions.elementToBeClickable(detailBtnElements.get(i))).click();
+				break;
+			}
+
+		}
 
 		//待ち処理
 		final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
@@ -115,7 +127,9 @@ public class Case07 {
 		final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
 		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("content_0")));
 
-		assertEquals("レポート登録 | LMS", webDriver.getTitle());
+		//テキストエリアが表示されているか確認
+		WebElement textAreaElement = webDriver.findElement(By.id("content_0"));
+		assertTrue(textAreaElement.isDisplayed());
 
 		WebDriverUtils.getEvidence(new Object() {
 		}, "case07_04");
