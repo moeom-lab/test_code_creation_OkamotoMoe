@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -93,6 +94,7 @@ public class Case08 {
 	@Order(3)
 	@DisplayName("テスト03 提出済の研修日の「詳細」ボタンを押下しセクション詳細画面に遷移")
 	void test03() {
+		//日付が一番若いもので検証
 		assertEquals("提出済み", webDriver.findElement(By.className("w10per")).getText());
 
 		//詳細ボタン押下
@@ -166,10 +168,23 @@ public class Case08 {
 	@Order(7)
 	@DisplayName("テスト07 該当レポートの「詳細」ボタンを押下しレポート詳細画面で修正内容が反映される")
 	void test07() {
-		WebElement detailElement = webDriver.findElement(By.cssSelector("input[value='詳細']"));
+		List<WebElement> reportRows = webDriver.findElements(By.cssSelector(".table.table-hover tr"));
+
+		// 一番下のレポート行を取得
+		WebElement targetRow = reportRows.get(reportRows.size() - 1);
+		WebElement detailElement = targetRow.findElement(By.cssSelector("input[value='詳細']"));
+
+		//該当レポートまでスクロール
+		((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+				detailElement);
+
 		detailElement.click();
 
-		//修正した文言になっているか確認
+		//待ち処理
+		final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
+		wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".table.table-hover td")));
+
+		// 修正した文言になっているか確認
 		List<WebElement> confirmTextElement = webDriver.findElements(By.cssSelector(".table.table-hover td"));
 		assertEquals("修正済みの日報", confirmTextElement.get(1).getText());
 
