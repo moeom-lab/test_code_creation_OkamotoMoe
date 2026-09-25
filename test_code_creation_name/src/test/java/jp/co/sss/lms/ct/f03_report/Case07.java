@@ -28,6 +28,7 @@ import jp.co.sss.lms.ct.util.WebDriverUtils;
 @TestMethodOrder(OrderAnnotation.class)
 @DisplayName("ケース07 受講生 レポート新規登録(日報) 正常系")
 public class Case07 {
+	private int targetIndex = -1;
 
 	/** 前処理 */
 	@BeforeAll
@@ -90,15 +91,17 @@ public class Case07 {
 	@DisplayName("テスト03 未提出の研修日の「詳細」ボタンを押下しセクション詳細画面に遷移")
 	void test03() {
 		//詳細ボタン押下
-		List<WebElement> detailBtnElements = webDriver.findElements(By.cssSelector("input[value='詳細']"));
-		List<WebElement> submitElements = webDriver
-				.findElements(By.cssSelector(".table.table-hover.sctionList td.w10per"));
-		for (int i = 0; i < submitElements.size(); i++) {
-			if ("未提出".equals(submitElements.get(i).getText())) {
-				final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
+		List<WebElement> rowElements = webDriver
+				.findElements(By.cssSelector(".table.table-hover.sctionList tr"));
+		for (int i = 0; i < rowElements.size(); i++) {
+			WebElement submitElement = rowElements.get(i).findElements(By.cssSelector("td")).get(2);
+			if ("未提出".equals(submitElement.getText())) {
 
-				wait.until(
-						ExpectedConditions.elementToBeClickable(detailBtnElements.get(i))).click();
+				targetIndex = i;
+
+				rowElements.get(i)
+						.findElement(By.cssSelector("input[value='詳細']"))
+						.click();
 				break;
 			}
 
