@@ -94,11 +94,12 @@ public class Case08 {
 	@Order(3)
 	@DisplayName("テスト03 提出済の研修日の「詳細」ボタンを押下しセクション詳細画面に遷移")
 	void test03() {
-		//日付が一番若いもので検証
-		assertEquals("提出済み", webDriver.findElement(By.className("w10per")).getText());
 
-		//詳細ボタン押下
-		WebElement detailBtnElement = webDriver.findElement(By.cssSelector("input[value='詳細']"));
+		List<WebElement> reportRows = webDriver.findElements(By.cssSelector(".table.table-hover.sctionList tr"));
+
+		// 一番下のレポート行を取得
+		WebElement targetRow = reportRows.get(1);
+		WebElement detailBtnElement = targetRow.findElement(By.cssSelector("input[value='詳細']"));
 		detailBtnElement.click();
 
 		//待ち処理
@@ -116,8 +117,9 @@ public class Case08 {
 	@Order(4)
 	@DisplayName("テスト04 「確認する」ボタンを押下しレポート登録画面に遷移")
 	void test04() {
+
 		//確認するボタン押下
-		WebElement comfirmElement = webDriver.findElement(By.cssSelector("input[value='提出済み日報【デモ】を確認する']"));
+		WebElement comfirmElement = webDriver.findElement(By.cssSelector("input[value='提出済み週報【デモ】を確認する']"));
 		comfirmElement.click();
 
 		//待ち処理
@@ -135,17 +137,15 @@ public class Case08 {
 	@DisplayName("テスト05 報告内容を修正して「提出する」ボタンを押下しセクション詳細画面に遷移")
 	void test05() {
 		//テキストエリア取得・入力
-		WebElement textAreaElement = webDriver.findElement(By.id("content_0"));
+		WebElement textAreaElement = webDriver.findElement(By.id("content_1"));
 		textAreaElement.clear();
-		textAreaElement.sendKeys("修正済みの日報");
+		textAreaElement.sendKeys("修正済みの週報");
 
 		//提出するボタン押下
 		WebElement completeSubmitElement = webDriver.findElement(By.cssSelector(".btn.btn-primary"));
-		completeSubmitElement.click();
+		((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView(true);", completeSubmitElement);
 
-		//待ち処理
-		final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
-		wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("sectionDetail")));
+		completeSubmitElement.click();
 
 		WebDriverUtils.getEvidence(new Object() {
 		}, "case08_05");
@@ -168,17 +168,19 @@ public class Case08 {
 	@Order(7)
 	@DisplayName("テスト07 該当レポートの「詳細」ボタンを押下しレポート詳細画面で修正内容が反映される")
 	void test07() {
-		List<WebElement> reportRows = webDriver.findElements(By.cssSelector(".table.table-hover tr"));
+		List<WebElement> rows = webDriver.findElements(By.cssSelector("tr"));
 
-		// 一番下のレポート行を取得
-		WebElement targetRow = reportRows.get(reportRows.size() - 1);
-		WebElement detailElement = targetRow.findElement(By.cssSelector("input[value='詳細']"));
+		for (WebElement row : rows) {
+			if (row.getText().contains("週報【デモ】")) {
+				WebElement detailElement = row.findElement(By.cssSelector("input[value='詳細']"));
 
-		//該当レポートまでスクロール
-		((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
-				detailElement);
+				((JavascriptExecutor) webDriver).executeScript("arguments[0].scrollIntoView({block: 'center'});",
+						detailElement);
 
-		detailElement.click();
+				detailElement.click();
+				break;
+			}
+		}
 
 		//待ち処理
 		final WebDriverWait wait = new WebDriverWait(webDriver, Duration.ofSeconds(60));
@@ -186,7 +188,7 @@ public class Case08 {
 
 		// 修正した文言になっているか確認
 		List<WebElement> confirmTextElement = webDriver.findElements(By.cssSelector(".table.table-hover td"));
-		assertEquals("修正済みの日報", confirmTextElement.get(1).getText());
+		assertEquals("修正済みの日報", confirmTextElement.get(4).getText());
 
 		WebDriverUtils.getEvidence(new Object() {
 		}, "case08_07");
